@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mood Matcher — AI + Cute UI 🎀</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body {
+        background: linear-gradient(135deg, #fdeff9 0%, #fce7f3 100%);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 30px;
+        color: #5b4266;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      .card {
+        background: #fffafc;
+        width: 420px;
+        border-radius: 18px;
+        box-shadow: 0 12px 30px rgba(107, 91, 149, 0.12);
+        padding: 26px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+      }
+      p.subtitle {
+        margin: 0 0 18px 0;
+        color: #8b7aa3;
+        font-size: 14px;
+      }
+
+      input[type="text"] {
+        width: calc(100% - 22px);
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #f0dff0;
+        outline: none;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+      .btn {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-pink {
+        background: #ffb6c1;
+        color: white;
+      }
+      .btn-secondary {
+        background: #fff;
+        color: #6b5b95;
+        border: 1px solid #f0dff0;
+      }
+
+      .mood-emoji {
+        font-size: 42px;
+        margin-top: 6px;
+      }
+      .result-box {
+        margin-top: 14px;
+        background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
+        padding: 14px;
+        border-radius: 12px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        text-align: left;
+      }
+
+      .suggestion {
+        margin: 8px 0;
+        padding: 8px;
+        border-radius: 8px;
+        background: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .suggestion a {
+        text-decoration: none;
+        color: #5b4266;
+        font-weight: 600;
+      }
+
+      .small {
+        font-size: 13px;
+        color: #8b7aa3;
+      }
+      .footer {
+        margin-top: 18px;
+        font-size: 12px;
+        color: #9a87ad;
+      }
+
+      .last-mood {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b5b95;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>🎀 Mood Matcher — AI powered</h1>
+      <p class="subtitle">
+        Type how you're feeling and get song ideas (AI detects mood ✨)
+      </p>
+
+      <form method="POST" action="/">
+        <input
+          type="text"
+          name="mood"
+          placeholder="e.g., I feel lonely and tired..."
+          value="{{ mood_text|default('') }}"
+        />
+
+        <div class="row">
+          <button class="btn btn-pink" type="submit">Suggest music</button>
+          <button
+            class="btn btn-secondary"
+            type="submit"
+            name="mood_boost"
+            value="yes"
+          >
+            Cheer me up 🌈
+          </button>
+        </div>
+      </form>
+
+      {% if detected %}
+      <div style="text-align: center">
+        <div class="mood-emoji">{{ emotions[detected]['emoji'] }}</div>
+        <div style="font-weight: 700; margin-top: 6px">
+          {{ emotions[detected]['desc'] }}
+        </div>
+        <div class="small">We analysed your text to detect this mood.</div>
+      </div>
+
+      <div class="result-box">
+        <div style="font-weight: 700; margin-bottom: 8px">
+          Here are 3 suggestions for you:
+        </div>
+
+        {% for s in suggestions %}
+        <div class="suggestion">
+          <div>
+            <div style="font-size: 14px">{{ s.title }}</div>
+            <div class="small">Click to open (YouTube search)</div>
+          </div>
+          <div><a href="{{ s.link }}" target="_blank">Open ▶</a></div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="small" style="margin-top: 10px">
+        Type something and press "Suggest music".
+      </div>
+      {% endif %} {% if last %}
+      <div class="last-mood">
+        Last saved: "<strong>{{ last.mood_text }}</strong>" — detected:
+        <strong
+          >{{ emotions[last.detected].emoji }} {{ emotions[last.detected].desc
+          }}</strong
+        >
+      </div>
+      {% endif %}
+
+      <div class="footer">
+        Tip: Try longer or descriptive sentences like “I feel anxious and can't
+        sleep” for more accurate detection.
+      </div>
+    </div>
+  </body>
+</html>
